@@ -25,7 +25,7 @@ final class Log {
   //
   //
 
-  /// A filter for console output. A log is printed if untagged, or if ALL of
+  /// A filter for console output. A log is printed if untagged, or if ANY of
   /// its tags are present in this set.
   static var activeTags = {#debug, ..._IconCategory.values.map((e) => e.tag)};
 
