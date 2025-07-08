@@ -111,6 +111,11 @@ final class Log {
   /// The internal function used for printing. Defaults to the standard `print`.
   static void Function(Object?) _printFunction = print;
 
+  /// Parse the given callstack to provide a shortened "location" printed at the
+  /// start of the log statement.
+  /// Outputs "library:filename #lineNumber" by default.
+  static LocationFormatter locationFormatter = _shortLocation;
+
   //
   //
   //
@@ -521,7 +526,7 @@ final class Log {
     Frame? frame;
     if (includePath) {
       frame = Here(max(0, initialStackLevel - 1)).call().orNull();
-      location = _shortLocation(frame?.location, frame?.member);
+      location = locationFormatter(frame?.location, frame?.member);
     }
 
     // Combine tags with the tag from category.
@@ -578,6 +583,8 @@ final class Log {
 typedef Glog = Log;
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+typedef LocationFormatter = String? Function(String? location, String? member);
 
 String? _shortLocation(String? location, String? member) {
   if (location == null) {
