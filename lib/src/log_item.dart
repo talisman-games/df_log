@@ -10,6 +10,8 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //.title~
 
+import 'package:meta/meta.dart';
+
 import '/_common.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -25,7 +27,10 @@ final class LogItem {
   final String? location;
   final String? icon;
   final Object? message;
+  final Object? metadata;
   final Set<Symbol> tags;
+  final int internalIndex;
+  static int _internalCount = 0;
 
   //
   //
@@ -39,17 +44,20 @@ final class LogItem {
   //
   //
 
+  @protected
   LogItem({
     required this.location,
     required this.icon,
     required this.message,
+    required this.metadata,
     required this.tags,
     required this.showId,
     required this.showTags,
     required this.showTimestamp,
     required this.frame,
   }) : id = const Uuid().v4(),
-       timestamp = DateTime.now();
+       timestamp = DateTime.now(),
+       internalIndex = _internalCount++;
 
   //
   //
@@ -153,24 +161,19 @@ final class LogItem {
     final uri = frame?.uri.toString();
 
     return {
+      'id': id,
+      'column': column,
       'icon': icon != null && (location != null && location!.isNotEmpty)
           ? icon
           : null,
-      'location': location != null && location!.isNotEmpty ? location : null,
-      'message': () {
-        try {
-          return message?.toString();
-        } catch (e) {
-          return null;
-        }
-      }(),
-      'timestamp': timestamp.toIso8601String(),
-      'tags': tags.isNotEmpty ? tags.map(_unmangleSymbol).toList() : null,
-      'id': id,
-      'column': column,
-      'line': line,
-      'package': package,
+      'internalIndex': internalIndex,
       'library': library,
+      'line': line,
+      'location': location != null && location!.isNotEmpty ? location : null,
+      'message': message?.toString(),
+      'package': package,
+      'tags': tags.isNotEmpty ? tags.map(_unmangleSymbol).toList() : null,
+      'timestamp': timestamp.toIso8601String(),
       'uri': uri,
     };
   }
